@@ -11,3 +11,6 @@
 
 #!.yarn/cache
 .pnp.*
+
+# Ignore Node modules
+node_modules
