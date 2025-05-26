@@ -62,6 +62,59 @@ router.get("/", validateBlogQuery, BlogController.getBlogs);
 
 /**
  * @swagger
+ * /blogs/tags:
+ *   get:
+ *     summary: Get all blog tags
+ *     description: Retrieve a list of all unique tags used across all blog posts with usage count
+ *     tags: [Blogs]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved tags
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/SuccessResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         tags:
+ *                           type: array
+ *                           items:
+ *                             type: string
+ *                           description: Array of unique tag names
+ *                           example: ["javascript", "nodejs", "typescript", "backend"]
+ *                         total:
+ *                           type: integer
+ *                           description: Total number of unique tags
+ *                           example: 12
+ *                         tagDetails:
+ *                           type: array
+ *                           items:
+ *                             type: object
+ *                             properties:
+ *                               tag:
+ *                                 type: string
+ *                                 description: Tag name
+ *                                 example: "javascript"
+ *                               count:
+ *                                 type: integer
+ *                                 description: Number of blogs using this tag
+ *                                 example: 5
+ *                           description: Detailed information about each tag including usage count
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.get("/tags", BlogController.getTags);
+
+/**
+ * @swagger
  * /blogs/{id}:
  *   get:
  *     summary: Get blog by ID

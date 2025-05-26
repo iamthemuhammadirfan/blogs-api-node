@@ -160,6 +160,50 @@ class BlogController {
     }
   });
 
+  // GET /api/blogs/tags
+  static getTags = asyncHandler(async (req, res) => {
+    try {
+      // Use MongoDB aggregation to get all unique tags
+      const tagsResult = await Blog.aggregate([
+        // Unwind the tags array to create a document for each tag
+        { $unwind: "$tags" },
+        // Group by tag and count occurrences
+        {
+          $group: {
+            _id: "$tags",
+            count: { $sum: 1 },
+          },
+        },
+        // Sort by count in descending order
+        { $sort: { count: -1 } },
+        // Format the output
+        {
+          $project: {
+            _id: 0,
+            tag: "$_id",
+            count: 1,
+          },
+        },
+      ]);
+
+      // Extract just the tag names for simpler response
+      const tags = tagsResult.map((item) => item.tag);
+
+      return sendSuccessResponse(
+        res,
+        {
+          tags,
+          total: tags.length,
+          tagDetails: tagsResult, // Include count details for additional information
+        },
+        "Tags retrieved successfully"
+      );
+    } catch (error) {
+      console.error("Error fetching tags:", error);
+      throw new AppError("Failed to fetch tags", 500, "FETCH_TAGS_ERROR");
+    }
+  });
+
   // DELETE /api/blogs/:id (Optional - for deleting blogs)
   static deleteBlog = asyncHandler(async (req, res) => {
     const { id } = req.params;
